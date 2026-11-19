@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>만화 취향 테스트</title>
+<meta name="description" content="예, 아니오 열다섯 번으로 나의 만화 취향 유형과 지금 펼쳐 볼 작품 네 편을 찾아보세요.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="만화 취향 테스트 — 열다섯 컷이면 당신의 취향이 보여요">
+<meta property="og:description" content="예, 아니오 열다섯 번으로 나의 만화 취향 유형과 추천작 네 편을 찾아보세요.">
+<meta property="og:url" content="https://jmkoo-source.github.io/manga-taste-test/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@600&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --sunk:#EBEFF4; --paper:#FFFFFF;
+  --ink:#1C242F; --ink-2:#465163; --ink-3:#5E697A;
+  --line:#DEE3EA; --line-strong:#C5CDD8;
+  --accent:#0069C4; --on-accent:#FFFFFF; --accent-soft:#E9F5FF;
+  --tone:rgb(28 36 47 / .42);
+  --shadow:0 1px 2px rgb(16 24 40 / .06), 0 1px 3px rgb(16 24 40 / .05);
+  --lift:0 6px 24px rgb(16 24 40 / .08);
+  --g0:#2a78d6; --g1:#eb6834; --g2:#1baf7a; --g3:#eda100; --g4:#e87ba4; --g5:#008300; --g6:#6250d6;
+  --av-p:26%; --av-base:var(--surface);
+  --mark-p:38%;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#10151C; --surface:#18202A; --sunk:#202935; --paper:#1D2631;
+  --ink:#E6EAF0; --ink-2:#AEB8C5; --ink-3:#8590A0;
+  --line:#29323E; --line-strong:#3A4553;
+  --accent:#5CB6FF; --on-accent:#08131F; --accent-soft:#13283E;
+  --tone:rgb(230 234 240 / .40);
+  --shadow:0 1px 2px rgb(0 0 0 / .35);
+  --lift:0 6px 24px rgb(0 0 0 / .35);
+  --g0:#3987e5; --g1:#d95926; --g2:#199e70; --g3:#c98500; --g4:#d55181; --g5:#008300; --g6:#9085e9;
+  --av-p:34%; --av-base:var(--ink);
+  --mark-p:48%;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#10151C; --surface:#18202A; --sunk:#202935; --paper:#1D2631;
+  --ink:#E6EAF0; --ink-2:#AEB8C5; --ink-3:#8590A0;
+  --line:#29323E; --line-strong:#3A4553;
+  --accent:#5CB6FF; --on-accent:#08131F; --accent-soft:#13283E;
+  --tone:rgb(230 234 240 / .40);
+  --shadow:0 1px 2px rgb(0 0 0 / .35);
+  --lift:0 6px 24px rgb(0 0 0 / .35);
+  --g0:#3987e5; --g1:#d95926; --g2:#199e70; --g3:#c98500; --g4:#d55181; --g5:#008300; --g6:#9085e9;
+  --av-p:34%; --av-base:var(--ink);
+  --mark-p:48%;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 'IBM Plex Sans KR',system-ui,sans-serif;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent-soft);color:var(--ink)}
+a{color:var(--accent);text-underline-offset:3px}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:6px}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:600px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+.kicker{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.01em;margin:0 0 10px}
+.serif{font-family:'Hahmlet',serif;font-weight:600}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:500;font-variant-numeric:tabular-nums}
+
+/* ---------- 만화 한 페이지(15컷) ---------- */
+.pg{display:flex;flex-direction:column;gap:5px;padding:7px;aspect-ratio:3/4;background:var(--paper);border:1px solid var(--line-strong);box-shadow:var(--shadow);border-radius:2px}
+.pg-row{display:flex;gap:5px;flex:1 1 0;min-height:0}
+.pg-cut{flex:1 1 0;min-width:0;border:1.6px solid var(--ink);border-radius:1.5px;position:relative;background:var(--paper);transition:background-color .2s ease-out;display:flex;align-items:center;justify-content:center}
+.pg-cut.is-yes{background:var(--ink)}
+.pg-cut.is-no{background-image:radial-gradient(var(--tone) .95px,transparent 1.25px);background-size:5px 5px}
+.pg-cut.just{animation:ink .26s ease-out}
+@keyframes ink{from{transform:scale(.86);opacity:.4}to{transform:none;opacity:1}}
+.pg-cut.is-cur{outline:2.5px solid var(--accent);outline-offset:2px;z-index:1}
+.pg-cut span{font-size:12px;font-weight:600;line-height:1;padding:2px 3px;border-radius:3px;white-space:nowrap}
+.pg-cut.is-yes span{color:var(--paper)}
+.pg-cut.is-no span{color:var(--ink-2);background:var(--paper)}
+.pg-cut.is-skip{background-image:repeating-linear-gradient(135deg,transparent 0 4px,var(--line-strong) 4px 5.2px)}
+.pg-cut.is-skip span{color:var(--ink-3);background:var(--paper)}
+
+/* ---------- 시작 ---------- */
+.hero h1{font-family:'Hahmlet',serif;font-weight:600;font-size:34px;line-height:1.28;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance}
+.lead{font-size:16px;line-height:1.65;color:var(--ink-2);margin:0 0 26px;text-wrap:pretty}
+.preview{display:grid;grid-template-columns:132px 1fr;gap:22px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:24px}
+.preview h2{font-size:14px;font-weight:600;margin:0 0 4px}
+.preview p{font-size:14px;line-height:1.55;color:var(--ink-2);margin:0 0 14px}
+.faces{display:flex;flex-wrap:wrap;gap:6px}
+.faces svg{display:block}
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border:0;border-radius:14px;background:var(--accent);color:var(--on-accent);font-size:17px;font-weight:600;cursor:pointer;transition:transform .12s ease-out,filter .12s}
+.cta:hover{filter:brightness(1.06)}
+.cta:active{transform:translateY(1px)}
+.meta{font-size:13px;color:var(--ink-3);text-align:center;margin:12px 0 0}
+
+/* ---------- 질문 ---------- */
+.qtop{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:6px}
+.qtop .pg{width:120px;flex:none}
+.qcount{text-align:right}
+.qcount .num{font-size:28px;line-height:1;color:var(--ink)}
+.qcount .num small{font-size:15px;color:var(--ink-3)}
+.qcount p{font-size:13px;color:var(--ink-3);margin:6px 0 0}
+.bubble{position:relative;background:var(--surface);border:2px solid var(--ink);border-radius:28px;padding:30px 22px 28px;margin:22px 0 22px;min-height:168px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.bubble::before,.bubble::after{content:"";position:absolute;left:46px;width:0;height:0;border-style:solid}
+.bubble::before{top:-17px;border-width:0 11px 17px 11px;border-color:transparent transparent var(--ink) transparent}
+.bubble::after{top:-12.5px;left:48.5px;border-width:0 8.5px 13px 8.5px;border-color:transparent transparent var(--surface) transparent}
+.bubble h2{font-family:'Hahmlet',serif;font-weight:600;font-size:24px;line-height:1.5;margin:0;text-wrap:balance;outline:none}
+.bubble .in{transition:opacity .2s ease-out,transform .2s ease-out}
+.bubble .in.out{opacity:0;transform:translateY(6px);transition-duration:.11s}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.yn button{min-height:58px;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s ease-out,background-color .12s,border-color .12s}
+.yn button:active{transform:translateY(1px)}
+.yes{background:var(--accent);color:var(--on-accent);border:0}
+.yes:hover{filter:brightness(1.06)}
+.no{background:var(--surface);color:var(--ink);border:1.5px solid var(--line-strong)}
+.no:hover{border-color:var(--ink-3)}
+.yn button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--ink-3)}
+.key{display:none;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;padding:1px 6px;border-radius:5px;border:1px solid currentColor;opacity:.7}
+@media (hover:hover) and (pointer:fine){.key{display:inline-block}}
+.qnav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px;border:0;background:none;color:var(--ink-2);font-size:14px;cursor:pointer}
+.skip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 6px;border:0;background:none;color:var(--ink-2);font-size:15px;font-weight:500;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:5px;cursor:pointer}
+.skip:hover{color:var(--ink);text-decoration-color:var(--ink-3)}
+.skip[aria-pressed="true"]{color:var(--ink);text-decoration-color:var(--ink)}
+.back:disabled{visibility:hidden}
+
+/* ---------- 결과 ---------- */
+.rhead{display:grid;grid-template-columns:88px 1fr;gap:18px;align-items:center;margin-bottom:18px}
+.rhead svg{display:block;width:88px;height:88px}
+.rhead .pre{font-size:14px;color:var(--ink-2);margin:0 0 4px}
+.rhead h1{font-family:'Hahmlet',serif;font-weight:600;font-size:32px;line-height:1.2;margin:0 0 6px;outline:none}
+.rhead h1 .mark{background:linear-gradient(transparent 60%,color-mix(in srgb,var(--tc) var(--mark-p),transparent) 60%);padding:0 2px}
+.rhead .tag{font-size:16px;line-height:1.5;color:var(--ink-2);margin:0;text-wrap:balance}
+.desc{font-size:16px;line-height:1.7;margin:0 0 14px;text-wrap:pretty}
+.traits{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.traits li{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:baseline;font-size:15px;line-height:1.55}
+.traits li::before{content:"";width:9px;height:9px;border:1.6px solid var(--ink);background:var(--tc);border-radius:1.5px;transform:translateY(-1px)}
+.like{font-size:13px;line-height:1.55;color:var(--ink-3);margin:0 0 26px;padding-top:12px;border-top:1px dashed var(--line-strong)}
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 8px;margin-bottom:16px}
+.sec-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 12px;margin-bottom:6px}
+.sec-h h2{font-family:'Hahmlet',serif;font-weight:600;font-size:20px;line-height:1.35;margin:0}
+.chip{font-size:13px;color:var(--ink-2);background:var(--sunk);border-radius:999px;padding:3px 10px}
+.books{list-style:none;margin:0;padding:0}
+.books li+li{border-top:1px solid var(--line)}
+.books a{display:grid;grid-template-columns:8px 1fr auto;gap:14px;align-items:center;min-height:64px;padding:10px 0;text-decoration:none;color:var(--ink)}
+.spine{width:8px;height:44px;border-radius:2px;background:color-mix(in srgb,var(--tc) var(--sp),var(--surface));border:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}
+.bt{font-size:16px;font-weight:500;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bm{font-size:13px;color:var(--ink-3);margin-top:2px}
+.go{font-size:13px;color:var(--accent);white-space:nowrap}
+.books a:hover .bt{text-decoration:underline;text-underline-offset:3px}
+.duo{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px}
+.duo .sec{margin:0;padding-bottom:20px}
+.mine{display:grid;grid-template-columns:180px 1fr;gap:22px;align-items:center}
+#r-mine p{font-size:15px;line-height:1.65;color:var(--ink-2);margin:0}
+#r-mine p+p{margin-top:10px}
+#r-mine .why{color:var(--ink)}
+.mine p{font-size:15px;line-height:1.65;color:var(--ink-2);margin:0}
+.mine p b{color:var(--ink);font-weight:600}
+.legend{display:grid;gap:6px;margin-top:10px;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:16px;height:16px;border:1.6px solid var(--ink);border-radius:1.5px;background:var(--paper)}
+.sw.y{background:var(--ink)}
+.sw.n{background-image:radial-gradient(var(--tone) .95px,transparent 1.25px);background-size:5px 5px}
+.sw.s{background-image:repeating-linear-gradient(135deg,transparent 0 4px,var(--line-strong) 4px 5.2px)}
+.second{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;margin-bottom:12px}
+.second svg{display:block}
+.second .pre{font-size:13px;color:var(--ink-3);margin:0}
+.second h3{font-family:'Hahmlet',serif;font-weight:600;font-size:18px;line-height:1.3;margin:2px 0 0}
+.second-books{list-style:none;margin:0;padding:0;font-size:14px;line-height:1.5}
+.second-books li{border-top:1px solid var(--line)}
+.second-books a{display:flex;align-items:center;min-height:44px}
+.second-books a{color:var(--ink);text-decoration:none}
+.second-books a:hover{text-decoration:underline}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0 8px}
+.acts button{min-height:52px;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer}
+.ghost{background:var(--surface);border:1.5px solid var(--line-strong);color:var(--ink)}
+.ghost:hover{border-color:var(--ink-3)}
+.acts .cta{min-height:52px;font-size:16px}
+.status{min-height:20px;font-size:13px;color:var(--ink-2);text-align:center;margin:0 0 18px}
+details.all{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:22px}
+details.all summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:0 20px;font-size:15px;font-weight:600}
+details.all summary::-webkit-details-marker{display:none}
+details.all summary::after{content:"";width:8px;height:8px;border-right:1.8px solid var(--ink-2);border-bottom:1.8px solid var(--ink-2);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+details.all[open] summary::after{transform:rotate(225deg) translateY(-1px)}
+.types{list-style:none;margin:0;padding:0 20px 8px}
+.types li{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.types b{font-family:'Hahmlet',serif;font-weight:600;font-size:16px}
+.types li.me b::after{content:"내 유형";font-family:'IBM Plex Sans KR',sans-serif;font-size:12px;font-weight:600;color:var(--accent);margin-left:8px}
+.types span{display:block;font-size:13px;color:var(--ink-2);line-height:1.5}
+.foot{font-size:12px;line-height:1.6;color:var(--ink-3);margin:0}
+.screen{animation:in .24s ease-out}
+#start,#quiz{min-height:calc(100dvh - 76px);display:flex;flex-direction:column;justify-content:center}
+#start>*,#quiz>*{flex:none}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media (max-width:480px){
+  .wrap{padding-top:20px}
+  .hero h1{font-size:28px}
+  .preview{grid-template-columns:104px 1fr;gap:16px;padding:16px}
+  .qtop .pg{width:104px}
+  .bubble{padding:28px 18px 26px;min-height:156px}
+  .bubble h2{font-size:20px}
+  .rhead{grid-template-columns:72px 1fr;gap:14px}
+  .rhead svg{width:72px;height:72px}
+  .rhead h1{font-size:28px}
+  .sec{padding:18px 16px 6px}
+  .duo .sec{padding-bottom:18px}
+  .mine{grid-template-columns:1fr;gap:14px;justify-items:center}
+  .mine .pg{width:200px}
+  .mine>div:last-child{justify-self:stretch}
+  .legend{grid-auto-flow:column;justify-content:start;gap:14px}
+  .go-t{display:none}
+  .go{font-size:16px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- 시작 -->
+  <section id="start" class="screen hero" aria-labelledby="t-start">
+    <p class="kicker">만화 취향 테스트</p>
+    <h1 id="t-start" tabindex="-1">열다섯 컷이면 당신의 만화 취향이 보여요</h1>
+    <p class="lead">질문 열다섯 개에 예, 아니오로 답해 주세요. 잘 모르겠으면 건너뛰어도 돼요. 일곱 가지 독자 유형 가운데 당신과 닮은 하나와, 지금 펼쳐 볼 작품 네 편을 골라 드려요.</p>
+    <div class="preview">
+      <div class="pg" id="pg-start" aria-hidden="true"></div>
+      <div>
+        <h2>일곱 가지 독자 유형</h2>
+        <p>답할 때마다 페이지의 컷이 하나씩 채워져요. 다 채우면 당신의 유형이 나와요.</p>
+        <div class="faces" id="faces"></div>
+      </div>
+    </div>
+    <button class="cta" id="go" type="button">테스트 시작</button>
+    <p class="meta">질문 15개 · 2분이면 끝나요</p>
+  </section>
+
+  <!-- 질문 -->
+  <section id="quiz" class="screen" hidden aria-label="질문">
+    <div class="qtop">
+      <div class="pg" id="pg-quiz" role="img" aria-label="진행 상황"></div>
+      <div class="qcount">
+        <div class="num" id="qn" aria-hidden="true">1<small> / 15</small></div>
+        <p id="qleft">남은 질문 8개</p>
+      </div>
+    </div>
+    <div class="bubble" aria-live="polite">
+      <div class="in" id="qin">
+        <h2 id="qtext" tabindex="-1"></h2>
+      </div>
+    </div>
+    <div class="yn">
+      <button class="yes" id="b-yes" type="button" aria-pressed="false">예 <span class="key" aria-hidden="true">Y</span></button>
+      <button class="no" id="b-no" type="button" aria-pressed="false">아니오 <span class="key" aria-hidden="true">N</span></button>
+    </div>
+    <div class="qnav">
+      <button class="back" id="b-back" type="button"><span aria-hidden="true">←</span> 이전 질문</button>
+      <button class="skip" id="b-skip" type="button" aria-pressed="false">잘 모르겠어요 <span class="key" aria-hidden="true">M</span></button>
+    </div>
+  </section>
+
+  <!-- 결과 -->
+  <section id="result" class="screen" hidden aria-labelledby="r-name">
+    <p class="kicker">만화 취향 테스트 결과</p>
+    <div class="rhead">
+      <div id="r-av"></div>
+      <div>
+        <p class="pre">당신의 만화 취향은</p>
+        <h1 id="r-name" tabindex="-1"></h1>
+        <p class="tag" id="r-tag"></p>
+      </div>
+    </div>
+    <p class="desc" id="r-desc"></p>
+    <ul class="traits" id="r-traits"></ul>
+    <p class="like" id="r-like"></p>
+
+    <div class="sec">
+      <div class="sec-h">
+        <h2>지금 펼쳐 볼 네 작품</h2>
+        <span class="chip" id="r-sub"></span>
+      </div>
+      <ol class="books" id="r-books"></ol>
+    </div>
+
+    <div class="duo">
+      <div class="sec">
+        <div class="sec-h"><h2>나의 한 페이지</h2></div>
+        <div class="mine">
+          <div class="pg" id="pg-mine" role="img"></div>
+          <div>
+            <div id="r-mine"></div>
+            <div class="legend" aria-hidden="true">
+              <span><i class="sw y"></i>예</span>
+              <span><i class="sw n"></i>아니오</span>
+              <span><i class="sw s"></i>잘 모르겠어요</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="second">
+          <div id="s-av"></div>
+          <div>
+            <p class="pre">두 번째로 가까운 유형</p>
+            <h3 id="s-name"></h3>
+          </div>
+        </div>
+        <ul class="second-books" id="s-books"></ul>
+      </div>
+    </div>
+
+    <div class="acts">
+      <button class="ghost" id="b-copy" type="button">결과 복사</button>
+      <button class="cta" id="b-again" type="button">다시 하기</button>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+
+    <details class="all">
+      <summary>일곱 가지 유형 모두 보기</summary>
+      <ul class="types" id="all-types"></ul>
+    </details>
+    <p class="foot">만화 독자의 취향을 일곱 갈래, 서른두 가지 세부 취향으로 나눠 만든 재미용 테스트예요. 추천작은 닮은 세부 취향의 인기작 가운데 답에 맞는 것을 골랐고, 같은 시리즈는 한 번만 넣고 성인 작품은 뺐어요. 작품 링크는 리디 검색으로 열려요.</p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const D = {"questions":[{"k":"act","q":"주인공이 한계를 넘어 각성하는 장면에서 소름이 돋는다","cut":"각성"},{"k":"love","q":"두 사람이 언제 이어질지 애태우는 이야기가 좋다","cut":"설렘"},{"k":"hero","q":"멋진 남자 캐릭터를 보는 재미로 작품을 고를 때가 많다","cut":"남캐"},{"k":"daily","q":"큰 사건 없이 흘러가는 소소한 하루, 맛있는 밥 이야기가 좋다","cut":"일상"},{"k":"laugh","q":"피식 웃게 되는 개그 컷이 많은 작품에 손이 간다","cut":"개그"},{"k":"done","q":"연재를 기다리기보다 완결 난 작품을 한 번에 몰아 보는 게 좋다","cut":"정주행"},{"k":"classic","q":"요즘 작품만큼 오래된 명작도 찾아 읽는다","cut":"명작"},{"k":"dark","q":"잔혹하거나 어두운 분위기의 이야기도 거리낌 없이 본다","cut":"어둠"},{"k":"isekai","q":"다시 태어나거나 다른 세계로 떨어지는 이야기에 끌린다","cut":"이세계"},{"k":"rofan","q":"드레스, 무도회, 그리고 파혼 선언. 이 세 단어에 눈이 간다","cut":"영애"},{"k":"novel","q":"그림 없이 글로만 된 소설, 특히 라이트노벨도 즐겨 읽는다","cut":"소설"},{"k":"sports","q":"땀 흘리며 한 가지에 몰두하는 스포츠·성장 이야기가 좋다","cut":"열정"},{"k":"mystery","q":"수수께끼를 풀거나 반전이 기다리는 이야기가 좋다","cut":"추리"},{"k":"deep","q":"다 읽고 나서 한참 생각하게 만드는 이야기가 좋다","cut":"여운"},{"k":"girls","q":"여자 캐릭터들끼리 서로 아끼는 모습을 보면 마음이 몽글몽글해진다","cut":"케미"}],"pri":[0,3,2,1,4,5,6],"tag_w":0.45,"pub":true,"who":{},"types":{"0":{"name":"열혈 모험가","tag":"각성하는 한 컷을 위해 페이지를 넘기는 사람","desc":"주인공이 한계를 넘는 순간, 넘기는 손이 빨라지죠. 지금 가장 뜨거운 화제작을 놓치지 않고 따라가는 타입이에요.","traits":["신작 소식은 누구보다 빨리 챙긴다","명장면은 캡처해서 친구에게 보낸다","다음 권 나오는 날을 기억해 둔다"],"subs":[{"id":0,"name":"모두가 아는 대작","lp":[[-0.1625,-1.8971],[-1.0498,-0.4308],[-1.0498,-0.4308],[-1.3863,-0.2877],[-0.5978,-0.7985],[-0.6931,-0.6931],[-0.6931,-0.6931],[-0.5108,-0.9163],[-0.7985,-0.5978],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.5978,-0.7985],[-1.0498,-0.4308],[-1.0498,-0.4308],[-1.204,-0.3567]],"works":[{"t":"황천의 츠가이","c":0,"g":"판타지·SF","f":"황천의츠가이","tags":[],"fem":0.5},{"t":"원피스","c":0,"g":"판타지·SF","f":"원피스","tags":["classic"],"fem":0.5},{"t":"슬램덩크(SLAM DUNK)","c":0,"g":"스포츠","f":"슬램덩크","tags":["classic","sports"],"fem":0.5},{"t":"체인소 맨","c":0,"g":"액션","f":"체인소맨","tags":["act","dark"],"fem":0.5},{"t":"원펀맨","c":0,"g":"액션","f":"원펀맨","tags":["act","laugh"],"fem":0.5},{"t":"베르세르크","c":0,"g":"판타지·SF","f":"베르세르크","tags":["classic","dark"],"fem":0.5},{"t":"아이실드21","c":0,"g":"스포츠","f":"아이실드21","tags":["classic","sports"],"fem":0.5},{"t":"단다단","c":0,"g":"액션","f":"단다단","tags":["act","laugh"],"fem":0.5},{"t":"드래곤볼 신장판","c":0,"g":"액션","f":"드래곤볼","tags":["act","classic"],"fem":0.5},{"t":"H2 오리지널","c":0,"g":"스포츠","f":"h2","tags":["classic","sports"],"fem":0.5}]},{"id":2,"name":"요즘 뜨는 배틀 액션","lp":[[-0.1625,-1.8971],[-1.0498,-0.4308],[-0.5108,-0.9163],[-1.3863,-0.2877],[-0.5978,-0.7985],[-1.6094,-0.2231],[-2.3026,-0.1054],[-0.4308,-1.0498],[-0.7985,-0.5978],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.6931,-0.6931],[-1.0498,-0.4308],[-1.0498,-0.4308],[-1.204,-0.3567]],"works":[{"t":"사카모토 데이즈","c":0,"g":"액션","f":"사카모토데이즈","tags":["act","laugh"],"fem":0.5},{"t":"블루 록","c":0,"g":"스포츠","f":"블루록","tags":["sports"],"fem":0.5},{"t":"GACHIAKUTA","c":0,"g":"판타지·SF","f":"gachiakuta","tags":["dark"],"fem":0.5},{"t":"괴수 8호","c":0,"g":"액션","f":"괴수8호","tags":["act"],"fem":0.5},{"t":"카구라바치","c":0,"g":"액션","f":"카구라바치","tags":["act","dark"],"fem":0.5},{"t":"지옥락","c":0,"g":"판타지·SF","f":"지옥락","tags":["dark"],"fem":0.5},{"t":"도쿄 리벤저스","c":0,"g":"액션","f":"도쿄리벤저스","tags":["act","dark"],"fem":0.5},{"t":"메이드 인 어비스","c":0,"g":"판타지·SF","f":"메이드인어비스","tags":["dark"],"fem":0.5},{"t":"최애의 아이","c":0,"g":"드라마","f":"최애의아이","tags":["dark","mystery"],"fem":0.5},{"t":"약속의 네버랜드","c":0,"g":"판타지·SF","f":"약속의네버랜드","tags":["dark","mystery"],"fem":0.5}]},{"id":3,"name":"두근두근 러브코미디","lp":[[-1.204,-0.3567],[-0.1054,-2.3026],[-2.3026,-0.1054],[-0.6931,-0.6931],[-0.2231,-1.6094],[-1.0498,-0.4308],[-1.204,-0.3567],[-2.3026,-0.1054],[-0.7985,-0.5978],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.6931,-0.6931],[-1.0498,-0.4308],[-1.0498,-0.4308],[-1.0498,-0.4308]],"works":[{"t":"슈퍼 뒤에서 담배 피우는 두 사람","c":0,"g":"순정","f":"슈퍼뒤에서담배피우는두사람","tags":["daily"],"fem":0.5},{"t":"향기로운 꽃은 늠름하게 핀다","c":0,"g":"순정","f":"향기로운꽃은늠름하게핀다","tags":[],"fem":0.5},{"t":"학생회에도 구멍은 있다!","c":0,"g":"학원","f":"학생회에도구멍은있다","tags":["laugh"],"fem":0.5},{"t":"너를 너무너무너무너무 좋아하는 100명의 그녀","c":0,"g":"순정","f":"너를너무너무너무너무좋아하는100명의그녀","tags":["laugh"],"fem":0.5},{"t":"보이시한 여자친구가 너무 귀여워","c":0,"g":"순정","f":"보이시한여자친구가너무귀여워","tags":[],"fem":0.5},{"t":"내 마음의 위험한 녀석","c":0,"g":"학원","f":"내마음의위험한녀석","tags":[],"fem":0.5},{"t":"비실비실 선생님","c":0,"g":"순정","f":"비실비실선생님","tags":[],"fem":0.5},{"t":"노아 선배는 친구","c":0,"g":"순정","f":"노아선배는친구","tags":[],"fem":0.5},{"t":"루리 드래곤","c":0,"g":"판타지·SF","f":"루리드래곤","tags":[],"fem":0.5},{"t":"푸른 상자","c":0,"g":"순정","f":"푸른상자","tags":[],"fem":0.5}]},{"id":1,"name":"판타지·학원 화제작","lp":[[-0.5978,-0.7985],[-0.6931,-0.6931],[-1.0498,-0.4308],[-1.3863,-0.2877],[-0.5108,-0.9163],[-1.0498,-0.4308],[-1.204,-0.3567],[-1.3863,-0.2877],[-0.7985,-0.5978],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.6931,-0.6931],[-0.3567,-1.204],[-0.5978,-0.7985],[-1.204,-0.3567]],"works":[{"t":"장송의 프리렌","c":0,"g":"판타지·SF","f":"장송의프리렌","tags":["deep"],"fem":0.5},{"t":"그 비스크 돌은 사랑을 한다","c":0,"g":"학원","f":"그비스크돌은사랑을한다","tags":[],"fem":0.5},{"t":"스파이 패밀리","c":0,"g":"액션","f":"스파이패밀리","tags":["act","laugh"],"fem":0.5},{"t":"명탐정 코난","c":0,"g":"추리","f":"명탐정코난","tags":["mystery"],"fem":0.5},{"t":"유희왕 애장판","c":0,"g":"판타지·SF","f":"유희왕","tags":["classic"],"fem":0.5},{"t":"이누야샤 와이드판","c":0,"g":"판타지·SF","f":"이누야샤","tags":["classic"],"fem":0.5},{"t":"공주님 \"고문\"의 시간입니다","c":0,"g":"코믹","f":"공주님고문의시간입니다","tags":["laugh"],"fem":0.5},{"t":"보이는 여고생","c":0,"g":"추리","f":"보이는여고생","tags":["mystery"],"fem":0.5},{"t":"어떤 과학의 초전자포","c":0,"g":"판타지·SF","f":"어떤과학의초전자포","tags":["classic"],"fem":0.5}]},{"id":4,"name":"무협·역사 대하 서사","lp":[[-0.1625,-1.8971],[-2.3026,-0.1054],[-2.3026,-0.1054],[-1.3863,-0.2877],[-1.204,-0.3567],[-0.3567,-1.204],[-0.2877,-1.3863],[-0.5108,-0.9163],[-0.7985,-0.5978],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.6931,-0.6931],[-1.0498,-0.4308],[-0.5108,-0.9163],[-1.204,-0.3567]],"works":[{"t":"더 화이팅 신장재편판","c":0,"g":"스포츠","f":"더화이팅","tags":["classic","sports"],"fem":0.5},{"t":"더 페이블","c":0,"g":"액션","f":"더페이블","tags":["act"],"fem":0.5},{"t":"킹덤","c":0,"g":"무협","f":"킹덤","tags":[],"fem":0.5},{"t":"열혈강호","c":0,"g":"무협","f":"열혈강호","tags":["classic"],"fem":0.5},{"t":"클레바테스","c":0,"g":"판타지·SF","f":"클레바테스","tags":[],"fem":0.5},{"t":"아르슬란 전기","c":0,"g":"판타지·SF","f":"아르슬란전기","tags":["classic"],"fem":0.5},{"t":"효게모노","c":0,"g":"드라마","f":"효게모노","tags":["classic"],"fem":0.5},{"t":"타워 던전","c":0,"g":"판타지·SF","f":"타워던전","tags":[],"fem":0.5},{"t":"빈란드 사가","c":0,"g":"드라마","f":"빈란드사가","tags":["dark","deep"],"fem":0.5},{"t":"기동전사 건담 0083 REBELLION","c":0,"g":"판타지·SF","f":"기동전사건담0083rebellion","tags":["classic"],"fem":0.5}]},{"id":5,"name":"이세계 무쌍 코믹","lp":[[-0.1625,-1.8971],[-1.0498,-0.4308],[-1.0498,-0.4308],[-1.3863,-0.2877],[-0.5978,-0.7985],[-1.0498,-0.4308],[-1.204,-0.3567],[-1.204,-0.3567],[-0.0513,-2.9957],[-3.5066,-0.0305],[-1.204,-0.3567],[-0.6931,-0.6931],[-1.0498,-0.4308],[-1.6094,-0.2231],[-1.204,-0.3567]],"works":[{"t":"추방당한 전생 중기사는 게임 지식으로 무쌍한다","c":0,"g":"판타지·SF","f":"추방당한전생중기사는게임지식으로무쌍한다","tags":["isekai"],"fem":0.5},{"t":"샹그릴라 프론티어","c":0,"g":"액션","f":"샹그릴라프론티어","tags":["act","isekai"],"fem":0.5},{"t":"이세계 삼촌","c":0,"g":"판타지·SF","f":"이세계삼촌","tags":["isekai"],"fem":0.5},{"t":"환생했는데 제7왕자라 내맘대로 마술을 연마합니다","c":0,"g":"판타지·SF","f":"환생했는데제7왕자라내맘대로마술을연마합니다","tags":["isekai"],"fem":0.5},{"t":"촌구석 아저씨, 검성이 되다","c":0,"g":"액션","f":"촌구석아저씨검성이되다","tags":["act","isekai"],"fem":0.5},{"t":"전생했더니 슬라임이었던 건에 대하여","c":1,"g":"판타지·SF","f":"슬라임","tags":["isekai"],"fem":0.5},{"t":"공주 기사는 야만족의 신부","c":0,"g":"판타지·SF","f":"공주기사는야만족의신부","tags":[],"fem":0.5},{"t":"유녀전기","c":1,"g":"판타지·SF","f":"유녀전기","tags":["isekai"],"fem":0.5},{"t":"무사태평 영주의 즐거운 영지 방어","c":0,"g":"판타지·SF","f":"무사태평영주의즐거운영지방어","tags":[],"fem":0.5},{"t":"시간 정지 용사","c":0,"g":"코믹","f":"시간정지용사","tags":["laugh"],"fem":0.5}]},{"id":6,"name":"라노벨 원작 코믹","lp":[[-0.6931,-0.6931],[-1.0498,-0.4308],[-1.0498,-0.4308],[-0.7985,-0.5978],[-0.5978,-0.7985],[-1.0498,-0.4308],[-1.204,-0.3567],[-0.5108,-0.9163],[-0.3567,-1.204],[-3.5066,-0.0305],[-0.5108,-0.9163],[-0.6931,-0.6931],[-0.5978,-0.7985],[-1.0498,-0.4308],[-1.204,-0.3567]],"works":[{"t":"약사의 혼잣말","c":1,"g":"추리","f":"약사","tags":["mystery"],"fem":0.5},{"t":"터무니없는 스킬로 이세계 방랑 밥","c":1,"g":"판타지·SF","f":"방랑밥","tags":["daily","isekai"],"fem":0.5},{"t":"변경의 팔라딘","c":1,"g":"판타지·SF","f":"변경의팔라딘","tags":[],"fem":0.5}]}]},"1":{"name":"정주행 장인","tag":"완결 세트를 쌓아 두고 밤새 달리는 사람","desc":"기다림보다 몰입이에요. 끝까지 나온 이야기를 처음부터 한 번에 읽어야 직성이 풀리죠. 세월이 증명한 명작을 믿는 타입이에요.","traits":["\"완결\"이라는 두 글자에 약하다","한 번 잡으면 마지막 권까지 간다","좋아하는 작품은 몇 번이고 다시 읽는다"],"subs":[{"id":7,"name":"명작 다크 판타지","lp":[[-0.2877,-1.3863],[-1.204,-0.3567],[-0.5978,-0.7985],[-1.204,-0.3567],[-0.7985,-0.5978],[-0.1625,-1.8971],[-0.1625,-1.8971],[-0.2231,-1.6094],[-1.6094,-0.2231],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.9163,-0.5108],[-0.6931,-0.6931],[-0.2877,-1.3863],[-1.3863,-0.2877]],"works":[{"t":"헌터X헌터 신장판","c":0,"g":"판타지·SF","f":"헌터x헌터","tags":["classic"],"fem":0.5},{"t":"던전밥","c":0,"g":"판타지·SF","f":"던전밥","tags":["daily"],"fem":0.5},{"t":"강철의 연금술사 완전판","c":0,"g":"판타지·SF","f":"강철의연금술사","tags":["classic"],"fem":0.5},{"t":"아인","c":0,"g":"액션","f":"아인","tags":["act","dark"],"fem":0.5},{"t":"도로헤도로","c":0,"g":"판타지·SF","f":"도로헤도로","tags":["dark"],"fem":0.5},{"t":"진격의 거인","c":0,"g":"액션","f":"진격의거인","tags":["act","dark"],"fem":0.5},{"t":"기생수","c":0,"g":"드라마","f":"기생수","tags":["classic","dark","deep"],"fem":0.5},{"t":"도박묵시록 카이지","c":0,"g":"드라마","f":"도박묵시록카이지","tags":["classic","dark","mystery"],"fem":0.5},{"t":"은수저","c":0,"g":"드라마","f":"은수저","tags":["classic","daily"],"fem":0.5},{"t":"모브 사이코 100","c":0,"g":"판타지·SF","f":"모브사이코100","tags":["laugh"],"fem":0.5}]},{"id":8,"name":"점프 배틀 명작","lp":[[-0.0834,-2.5257],[-1.204,-0.3567],[-0.3567,-1.204],[-1.204,-0.3567],[-0.5108,-0.9163],[-0.1625,-1.8971],[-0.1625,-1.8971],[-0.6931,-0.6931],[-1.6094,-0.2231],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.9163,-0.5108],[-0.6931,-0.6931],[-0.7985,-0.5978],[-1.3863,-0.2877]],"works":[{"t":"블리치","c":0,"g":"액션","f":"블리치","tags":["act","classic"],"fem":0.5},{"t":"나루토","c":0,"g":"액션","f":"나루토","tags":["act","classic"],"fem":0.5},{"t":"주술회전","c":0,"g":"액션","f":"주술회전","tags":["act","dark"],"fem":0.5},{"t":"하이큐!!","c":0,"g":"스포츠","f":"하이큐","tags":["sports"],"fem":0.5},{"t":"은혼","c":0,"g":"코믹","f":"은혼","tags":["classic","laugh"],"fem":0.5},{"t":"가정교사 히트맨 리본!","c":0,"g":"액션","f":"가정교사히트맨리본","tags":["act","classic"],"fem":0.5},{"t":"나의 히어로 아카데미아","c":0,"g":"액션","f":"나의히어로아카데미아","tags":["act"],"fem":0.5},{"t":"귀멸의 칼날","c":0,"g":"액션","f":"귀멸의칼날","tags":["act"],"fem":0.5}]},{"id":9,"name":"묵직한 드라마·역사","lp":[[-1.3863,-0.2877],[-0.9163,-0.5108],[-0.5978,-0.7985],[-1.204,-0.3567],[-1.3863,-0.2877],[-0.1625,-1.8971],[-0.1625,-1.8971],[-0.6931,-0.6931],[-1.6094,-0.2231],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.9163,-0.5108],[-0.6931,-0.6931],[-0.0513,-2.9957],[-1.3863,-0.2877]],"works":[{"t":"지. (지구의 운동에 대하여)","c":0,"g":"드라마","f":"지","tags":["dark","deep"],"fem":0.5},{"t":"피의 흔적","c":0,"g":"드라마","f":"피의흔적","tags":["dark","deep"],"fem":0.5},{"t":"그래도 마을은 돌아간다","c":0,"g":"드라마","f":"그래도마을은돌아간다","tags":["daily","deep"],"fem":0.5},{"t":"히스토리에","c":0,"g":"드라마","f":"히스토리에","tags":["dark","deep"],"fem":0.5},{"t":"아오노 군에게 닿고 싶으니까 죽고 싶어","c":0,"g":"순정","f":"아오노군에게닿고싶으니까죽고싶어","tags":["deep"],"fem":0.5},{"t":"천막의 자두가르","c":0,"g":"드라마","f":"천막의자두가르","tags":["deep"],"fem":0.5},{"t":"유가미 군은 친구가 없다","c":0,"g":"코믹","f":"유가미군은친구가없다","tags":["laugh"],"fem":0.5},{"t":"100미터.","c":0,"g":"스포츠","f":"100미터","tags":["sports"],"fem":0.5},{"t":"신부 이야기","c":0,"g":"드라마","f":"신부이야기","tags":["deep"],"fem":0.5},{"t":"위국일기","c":0,"g":"드라마","f":"위국일기","tags":["deep"],"fem":0.5}]},{"id":10,"name":"2000년대 명작","lp":[[-0.9163,-0.5108],[-0.6931,-0.6931],[-0.5978,-0.7985],[-1.204,-0.3567],[-0.7985,-0.5978],[-0.1625,-1.8971],[-0.0513,-2.9957],[-0.4308,-1.0498],[-1.6094,-0.2231],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.9163,-0.5108],[-0.2877,-1.3863],[-0.2231,-1.6094],[-1.3863,-0.2877]],"works":[{"t":"고스트 바둑왕","c":0,"g":"스포츠","f":"고스트바둑왕","tags":["classic","sports"],"fem":0.5},{"t":"데스노트","c":0,"g":"추리","f":"데스노트","tags":["classic","dark","mystery"],"fem":0.5},{"t":"나나","c":0,"g":"순정","f":"나나","tags":["classic"],"fem":0.5},{"t":"아카기","c":0,"g":"드라마","f":"아카기","tags":["classic","dark","mystery"],"fem":0.5}]},{"id":11,"name":"개성 폭발 모험극","lp":[[-0.2231,-1.6094],[-1.204,-0.3567],[-0.5108,-0.9163],[-1.204,-0.3567],[-0.4308,-1.0498],[-0.1625,-1.8971],[-0.1625,-1.8971],[-0.3567,-1.204],[-1.6094,-0.2231],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.9163,-0.5108],[-0.7985,-0.5978],[-0.2231,-1.6094],[-1.3863,-0.2877]],"works":[{"t":"골든 카무이","c":0,"g":"액션","f":"골든카무이","tags":["act"],"fem":0.5},{"t":"스틸 볼 런","c":0,"g":"액션","f":"죠죠","tags":["act","classic"],"fem":0.5}]},{"id":12,"name":"기묘하고 아름다운 SF","lp":[[-1.0498,-0.4308],[-1.204,-0.3567],[-0.5978,-0.7985],[-0.6931,-0.6931],[-0.7985,-0.5978],[-0.1625,-1.8971],[-0.1625,-1.8971],[-0.5978,-0.7985],[-1.6094,-0.2231],[-3.5066,-0.0305],[-2.1203,-0.1278],[-0.9163,-0.5108],[-0.5108,-0.9163],[-0.1054,-2.3026],[-1.3863,-0.2877]],"works":[{"t":"보석의 나라","c":0,"g":"판타지·SF","f":"보석의나라","tags":["dark","deep"],"fem":0.5},{"t":"충사","c":0,"g":"판타지·SF","f":"충사","tags":["classic","daily","deep"],"fem":0.5},{"t":"천국대마경","c":0,"g":"판타지·SF","f":"천국대마경","tags":["dark","mystery"],"fem":0.5},{"t":"무한의 주인(신장판)","c":0,"g":"액션","f":"무한의주인","tags":["act","classic","dark"],"fem":0.5},{"t":"소녀종말여행","c":0,"g":"판타지·SF","f":"소녀종말여행","tags":["daily","deep"],"fem":0.5}]}]},"2":{"name":"일상 수집가","tag":"소소한 장면에서 행복을 줍는 사람","desc":"큰 사건보다 캐릭터의 하루가 궁금해요. 귀여운 것, 맛있는 것, 반짝이는 성장 이야기를 틈틈이 휴대폰으로 챙겨 보는 타입이에요.","traits":["최애 캐릭터의 평범한 하루가 제일 좋다","출퇴근길, 자기 전에 한 화씩","웃기고 따뜻한 장면은 저장해 둔다"],"subs":[{"id":13,"name":"청춘 학원 액션","lp":[[-0.4308,-1.0498],[-0.6931,-0.6931],[-0.1054,-2.3026],[-0.2231,-1.6094],[-0.3567,-1.204],[-1.0498,-0.4308],[-1.3863,-0.2877],[-1.204,-0.3567],[-1.204,-0.3567],[-2.5257,-0.0834],[-2.5257,-0.0834],[-0.5108,-0.9163],[-0.7985,-0.5978],[-0.6931,-0.6931],[-0.7985,-0.5978]],"works":[{"t":"WIND BREAKER -윈브레-","c":0,"g":"액션","f":"windbreaker윈브레","tags":["act"],"fem":0.5},{"t":"악마에 입문했습니다! 이루마 군","c":0,"g":"판타지·SF","f":"이루마","tags":["laugh"],"fem":0.5},{"t":"망각 배터리","c":0,"g":"스포츠","f":"망각배터리","tags":["sports"],"fem":0.5},{"t":"학원 베이비시터즈","c":0,"g":"순정","f":"학원베이비시터즈","tags":[],"fem":0.5},{"t":"지박소년 하나코 군","c":0,"g":"순정","f":"지박소년하나코군","tags":[],"fem":0.5},{"t":"마왕성에서 잘 자요","c":0,"g":"판타지·SF","f":"마왕성에서잘자요","tags":["daily"],"fem":0.5},{"t":"팬텀 버스터즈","c":0,"g":"코믹","f":"팬텀버스터즈","tags":["laugh"],"fem":0.5},{"t":"다이아몬드 에이스","c":0,"g":"스포츠","f":"다이아몬드","tags":["sports"],"fem":0.5},{"t":"온화한 귀족의 휴가의 권장","c":0,"g":"판타지·SF","f":"온화한귀족의휴가의권장","tags":[],"fem":0.5},{"t":"디그 잇","c":0,"g":"스포츠","f":"디그잇","tags":["sports"],"fem":0.5}]},{"id":14,"name":"신작 판타지·미스터리","lp":[[-0.9163,-0.5108],[-0.6931,-0.6931],[-0.2877,-1.3863],[-0.6931,-0.6931],[-0.5978,-0.7985],[-1.0498,-0.4308],[-1.3863,-0.2877],[-0.5978,-0.7985],[-1.204,-0.3567],[-2.5257,-0.0834],[-2.5257,-0.0834],[-0.7985,-0.5978],[-0.2231,-1.6094],[-0.3567,-1.204],[-0.7985,-0.5978]],"works":[{"t":"고깔모자의 아틀리에","c":0,"g":"판타지·SF","f":"고깔모자의아틀리에","tags":[],"fem":0.5},{"t":"패밀리 레스토랑 가자","c":0,"g":"드라마","f":"패밀리레스토랑가자","tags":["daily"],"fem":0.5},{"t":"찍히지 않습니다","c":0,"g":"추리","f":"찍히지않습니다","tags":["dark","mystery"],"fem":0.5},{"t":"히카루가 죽은 여름","c":0,"g":"드라마","f":"히카루가죽은여름","tags":["dark","mystery"],"fem":0.5},{"t":"여학교의 별","c":0,"g":"드라마","f":"여학교의별","tags":[],"fem":0.5},{"t":"애프터 갓","c":0,"g":"판타지·SF","f":"애프터갓","tags":["dark"],"fem":0.5},{"t":"섀도 하우스","c":0,"g":"판타지·SF","f":"섀도하우스","tags":["dark","mystery"],"fem":0.5},{"t":"마기","c":0,"g":"판타지·SF","f":"마기","tags":[],"fem":0.5}]},{"id":16,"name":"웃음 가득 일상 코믹","lp":[[-1.8971,-0.1625],[-0.5978,-0.7985],[-0.2877,-1.3863],[-0.1054,-2.3026],[-0.0834,-2.5257],[-1.0498,-0.4308],[-1.3863,-0.2877],[-1.204,-0.3567],[-1.204,-0.3567],[-2.5257,-0.0834],[-2.5257,-0.0834],[-0.7985,-0.5978],[-0.7985,-0.5978],[-0.6931,-0.6931],[-0.7985,-0.5978]],"works":[{"t":"옆자리 녀석이 그런 눈으로 쳐다본다","c":0,"g":"순정","f":"옆자리녀석이그런눈으로쳐다본다","tags":[],"fem":0.5},{"t":"먼작귀(먼가 작고 귀여운 녀석)","c":0,"g":"코믹","f":"먼작귀","tags":["daily","laugh"],"fem":0.5},{"t":"상처와 붕대","c":0,"g":"순정","f":"상처와붕대","tags":[],"fem":0.5},{"t":"고향 최고!","c":0,"g":"드라마","f":"고향최고","tags":["daily","laugh"],"fem":0.5},{"t":"미팅에 나갔는데 여자가 없었던 이야기","c":0,"g":"순정","f":"미팅에나갔는데여자가없었던이야기","tags":[],"fem":0.5},{"t":"Veil","c":0,"g":"드라마","f":"veil","tags":[],"fem":0.5},{"t":"나기의 휴식","c":0,"g":"드라마","f":"나기의휴식","tags":["daily"],"fem":0.5},{"t":"아오이 군의 음담패설은 참을 수 없어","c":0,"g":"코믹","f":"아오이군의음담패설은참을수없어","tags":["laugh"],"fem":0.5},{"t":"폭식 너무 좋아! 모치즈키 양","c":0,"g":"드라마","f":"폭식너무좋아모치즈키양","tags":["daily"],"fem":0.5},{"t":"보스와 야스","c":0,"g":"코믹","f":"보스와야스","tags":["laugh"],"fem":0.5}]},{"id":15,"name":"청춘 성장 드라마","lp":[[-0.9163,-0.5108],[-0.6931,-0.6931],[-0.2877,-1.3863],[-0.4308,-1.0498],[-0.2231,-1.6094],[-1.0498,-0.4308],[-1.3863,-0.2877],[-1.204,-0.3567],[-1.204,-0.3567],[-2.5257,-0.0834],[-2.5257,-0.0834],[-0.2231,-1.6094],[-0.7985,-0.5978],[-0.4308,-1.0498],[-0.7985,-0.5978]],"works":[{"t":"메달리스트","c":0,"g":"스포츠","f":"메달리스트","tags":["deep","sports"],"fem":0.5},{"t":"스킵과 로퍼","c":0,"g":"순정","f":"스킵과로퍼","tags":[],"fem":0.5},{"t":"월간 순정 노자키군","c":0,"g":"순정","f":"월간순정노자키군","tags":["laugh"],"fem":0.5},{"t":"블루 피리어드","c":0,"g":"드라마","f":"블루피리어드","tags":["deep","sports"],"fem":0.5},{"t":"평범한 경음부","c":0,"g":"드라마","f":"평범한경음부","tags":["sports"],"fem":0.5},{"t":"세금으로 산 책","c":0,"g":"드라마","f":"세금으로산책","tags":["deep"],"fem":0.5},{"t":"아카네 이야기","c":0,"g":"드라마","f":"아카네이야기","tags":["sports"],"fem":0.5},{"t":"이거 그리고 죽어","c":0,"g":"드라마","f":"이거그리고죽어","tags":[],"fem":0.5},{"t":"위치 워치","c":0,"g":"판타지·SF","f":"위치워치","tags":[],"fem":0.5}]},{"id":17,"name":"판타지 코미디","lp":[[-0.6931,-0.6931],[-0.6931,-0.6931],[-0.2877,-1.3863],[-0.2231,-1.6094],[-0.1278,-2.1203],[-1.0498,-0.4308],[-1.3863,-0.2877],[-1.204,-0.3567],[-0.5108,-0.9163],[-2.5257,-0.0834],[-2.5257,-0.0834],[-0.7985,-0.5978],[-0.7985,-0.5978],[-0.6931,-0.6931],[-0.7985,-0.5978]],"works":[{"t":"마법 의사 렉스의 변태 카르테","c":0,"g":"판타지·SF","f":"마법의사렉스의변태카르테","tags":["laugh"],"fem":0.5},{"t":"마남 이치","c":0,"g":"판타지·SF","f":"마남이치","tags":[],"fem":0.5},{"t":"홀로서기 마왕성","c":0,"g":"판타지·SF","f":"홀로서기마왕성","tags":["isekai","laugh"],"fem":0.5},{"t":"매리지 톡신","c":0,"g":"판타지·SF","f":"매리지톡신","tags":[],"fem":0.5},{"t":"주식회사 마지루미에","c":0,"g":"판타지·SF","f":"주식회사마지루미에","tags":[],"fem":0.5},{"t":"유치원 WARS","c":0,"g":"액션","f":"유치원wars","tags":["act","laugh"],"fem":0.5},{"t":"이세계 미소녀가 되어 버린 아저씨와","c":0,"g":"판타지·SF","f":"이세계미소녀가되어버린아저씨와","tags":["isekai"],"fem":0.5},{"t":"언데드 언럭","c":0,"g":"판타지·SF","f":"언데드언럭","tags":[],"fem":0.5},{"t":"엑소시스트를 타락시킬 수 없어","c":0,"g":"판타지·SF","f":"엑소시스트를타락시킬수없어","tags":[],"fem":0.5},{"t":"여장 남자는 스커트를 벗고 싶어!","c":0,"g":"순정","f":"여장남자는스커트를벗고싶어","tags":[],"fem":0.5}]},{"id":18,"name":"어른의 일상·음식","lp":[[-0.9163,-0.5108],[-1.3863,-0.2877],[-0.7985,-0.5978],[-0.0513,-2.9957],[-0.2231,-1.6094],[-0.5978,-0.7985],[-0.5108,-0.9163],[-1.204,-0.3567],[-1.204,-0.3567],[-2.5257,-0.0834],[-2.5257,-0.0834],[-0.7985,-0.5978],[-0.7985,-0.5978],[-0.6931,-0.6931],[-0.7985,-0.5978]],"works":[{"t":"요츠바랑!","c":0,"g":"드라마","f":"요츠바랑","tags":["classic","daily","laugh"],"fem":0.5},{"t":"사채꾼 우시지마","c":0,"g":"드라마","f":"사채꾼우시지마","tags":["classic","dark"],"fem":0.5},{"t":"아빠는 요리사","c":0,"g":"드라마","f":"아빠는요리사","tags":["daily"],"fem":0.5},{"t":"3월의 라이온","c":0,"g":"순정","f":"3월의라이온","tags":["daily","deep","sports"],"fem":0.5},{"t":"사악한 신의 도시락 가게","c":0,"g":"판타지·SF","f":"사악한신의도시락가게","tags":["daily"],"fem":0.5},{"t":"세인트 영멘","c":0,"g":"코믹","f":"세인트영멘","tags":["daily","laugh"],"fem":0.5},{"t":"정액제 남편의 용돈 만세 ~월정액 21,000엔의 빈곤 라이프~","c":0,"g":"드라마","f":"정액제남편의용돈만세월정액21000엔의빈곤라이프","tags":[],"fem":0.5},{"t":"어제 뭐 먹었어?","c":0,"g":"드라마","f":"어제뭐먹었어","tags":["daily"],"fem":0.5},{"t":"울어라, 펜","c":0,"g":"드라마","f":"울어라펜","tags":[],"fem":0.5}]},{"id":19,"name":"그 시절 판타지 명작","lp":[[-0.9163,-0.5108],[-0.6931,-0.6931],[-0.2877,-1.3863],[-0.2231,-1.6094],[-0.2231,-1.6094],[-0.5108,-0.9163],[-0.1625,-1.8971],[-0.7985,-0.5978],[-0.9163,-0.5108],[-2.5257,-0.0834],[-2.5257,-0.0834],[-0.7985,-0.5978],[-0.7985,-0.5978],[-0.6931,-0.6931],[-0.7985,-0.5978]],"works":[{"t":"디 그레이맨","c":0,"g":"액션","f":"디그레이맨","tags":["act","classic"],"fem":0.5},{"t":"츠바사","c":0,"g":"순정","f":"츠바사","tags":["classic"],"fem":0.5},{"t":"나츠메 우인장","c":0,"g":"판타지·SF","f":"나츠메우인장","tags":["classic"],"fem":0.5},{"t":"×××HOLiC (×××홀릭)","c":0,"g":"판타지·SF","f":"holic","tags":["classic","mystery"],"fem":0.5},{"t":"흑집사","c":0,"g":"판타지·SF","f":"흑집사","tags":["classic","dark"],"fem":0.5}]}]},"3":{"name":"설렘 사냥꾼","tag":"눈맞춤 한 컷에 하루가 설레는 사람","desc":"고백 직전의 공기, 손끝이 스치는 순간을 사랑해요. 다음 화를 기다리며 두근거림을 이어 가는 타입이에요.","traits":["고백 장면은 몇 번이고 다시 본다","연재 알림이 오면 바로 연다","\"둘이 언제 사귀어?\"가 입버릇"],"subs":[{"id":20,"name":"요즘 화제 순정","lp":[[-2.3026,-0.1054],[-0.0513,-2.9957],[-0.1054,-2.3026],[-0.6931,-0.6931],[-0.5978,-0.7985],[-1.204,-0.3567],[-1.0498,-0.4308],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.8971,-0.1625],[-2.5257,-0.0834],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.204,-0.3567],[-1.3863,-0.2877]],"works":[{"t":"반딧불이의 혼례","c":0,"g":"순정","f":"반딧불이의혼례","tags":[],"fem":0.5},{"t":"불가항력의 I LOVE YOU","c":0,"g":"순정","f":"불가항력의iloveyou","tags":[],"fem":0.5},{"t":"아름다운 초저녁달","c":0,"g":"순정","f":"아름다운초저녁달","tags":[],"fem":0.5},{"t":"봄의 폭풍과 몬스터","c":0,"g":"순정","f":"봄의폭풍과몬스터","tags":[],"fem":0.5},{"t":"구하고, 잠식하고","c":0,"g":"순정","f":"구하고잠식하고","tags":[],"fem":0.5},{"t":"쓰레기 기둥서방 하나 군은 죽고 싶어 해","c":0,"g":"순정","f":"쓰레기기둥서방하나군은죽고싶어해","tags":[],"fem":0.5},{"t":"길고양이와 늑대","c":0,"g":"순정","f":"길고양이와늑대","tags":[],"fem":0.5},{"t":"내세에는 남남이 좋겠어","c":0,"g":"순정","f":"내세에는남남이좋겠어","tags":[],"fem":0.5},{"t":"밟고, 차고, 사랑하고","c":0,"g":"순정","f":"밟고차고사랑하고","tags":[],"fem":0.5},{"t":"귀엽다는 말 들은 적 없어!!","c":0,"g":"순정","f":"귀엽다는말들은적없어","tags":[],"fem":0.5}]},{"id":21,"name":"청춘 학원 순정","lp":[[-2.3026,-0.1054],[-0.0513,-2.9957],[-0.1054,-2.3026],[-0.4308,-1.0498],[-0.4308,-1.0498],[-1.204,-0.3567],[-1.0498,-0.4308],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.8971,-0.1625],[-2.5257,-0.0834],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.6094,-0.2231],[-1.3863,-0.2877]],"works":[{"t":"타몬 군 지금 어느 쪽?!","c":0,"g":"순정","f":"타몬군지금어느쪽","tags":[],"fem":0.5},{"t":"야마다 군과 Lv999의 사랑을 하다","c":0,"g":"순정","f":"야마다군과lv999의사랑을하다","tags":[],"fem":0.5},{"t":"사랑하라, 거짓된 천사들이여","c":0,"g":"순정","f":"사랑하라거짓된천사들이여","tags":[],"fem":0.5},{"t":"핑크와 하바네로","c":0,"g":"순정","f":"핑크와하바네로","tags":[],"fem":0.5},{"t":"안경, 때때로, 불량아","c":0,"g":"순정","f":"안경때때로불량아","tags":[],"fem":0.5},{"t":"가르쳐줘, 집사","c":0,"g":"순정","f":"가르쳐줘집사","tags":[],"fem":0.5},{"t":"빨리 하고 싶은 두 사람","c":0,"g":"순정","f":"빨리하고싶은두사람","tags":[],"fem":0.5},{"t":"너를 잊을 사랑이 하고 싶어","c":0,"g":"순정","f":"너를잊을사랑이하고싶어","tags":[],"fem":0.5},{"t":"달님이 바라시는대로","c":0,"g":"순정","f":"달님이바라시는대로","tags":[],"fem":0.5},{"t":"청춘벽력","c":0,"g":"순정","f":"청춘벽력","tags":[],"fem":0.5}]},{"id":22,"name":"달달한 순정 로맨스","lp":[[-2.3026,-0.1054],[-0.0513,-2.9957],[-0.1054,-2.3026],[-0.5978,-0.7985],[-0.5108,-0.9163],[-1.204,-0.3567],[-1.0498,-0.4308],[-2.3026,-0.1054],[-1.204,-0.3567],[-1.8971,-0.1625],[-2.5257,-0.0834],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.204,-0.3567],[-1.3863,-0.2877]],"works":[{"t":"얼굴만으론 좋아할 수 없어요","c":0,"g":"순정","f":"얼굴만으론좋아할수없어요","tags":[],"fem":0.5},{"t":"새벽의 연화","c":0,"g":"순정","f":"새벽의연화","tags":[],"fem":0.5},{"t":"야쿠자 때문에 목욕탕에서 일하고 있습니다","c":0,"g":"순정","f":"야쿠자때문에목욕탕에서일하고있습니다","tags":[],"fem":0.5},{"t":"도쿄 학생 애처가","c":0,"g":"순정","f":"도쿄학생애처가","tags":[],"fem":0.5},{"t":"하나노이 군과 상사병","c":0,"g":"순정","f":"하나노이군과상사병","tags":[],"fem":0.5},{"t":"기꺼이 하겠습니다","c":0,"g":"순정","f":"기꺼이하겠습니다","tags":[],"fem":0.5},{"t":"손끝과 연연","c":0,"g":"순정","f":"손끝과연연","tags":[],"fem":0.5},{"t":"우리 집에서는 기를 수 없어요!","c":0,"g":"순정","f":"우리집에서는기를수없어요","tags":["daily"],"fem":0.5},{"t":"우리 남동생들이 죄송합니다","c":0,"g":"순정","f":"우리남동생들이죄송합니다","tags":[],"fem":0.5}]},{"id":23,"name":"누구나 즐기는 순정","lp":[[-2.3026,-0.1054],[-0.0513,-2.9957],[-0.5978,-0.7985],[-0.6931,-0.6931],[-0.3567,-1.204],[-1.204,-0.3567],[-1.0498,-0.4308],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.8971,-0.1625],[-2.5257,-0.0834],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.204,-0.3567],[-0.9163,-0.5108]],"works":[{"t":"얼음 성벽","c":0,"g":"순정","f":"얼음성벽","tags":[],"fem":0.5},{"t":"정반대의 너와 나","c":0,"g":"순정","f":"정반대의너와나","tags":[],"fem":0.5},{"t":"오타쿠에게 사랑은 어려워","c":0,"g":"순정","f":"오타쿠에게사랑은어려워","tags":["laugh"],"fem":0.5}]},{"id":24,"name":"추억의 순정 명작","lp":[[-2.3026,-0.1054],[-0.0513,-2.9957],[-0.1054,-2.3026],[-0.6931,-0.6931],[-0.5978,-0.7985],[-0.5108,-0.9163],[-0.1054,-2.3026],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.8971,-0.1625],[-2.5257,-0.0834],[-2.3026,-0.1054],[-1.8971,-0.1625],[-1.204,-0.3567],[-1.3863,-0.2877]],"works":[{"t":"너에게 닿기를","c":0,"g":"순정","f":"너에게닿기를","tags":["classic"],"fem":0.5},{"t":"오늘부터 신령님","c":0,"g":"순정","f":"오늘부터신령님","tags":["classic"],"fem":0.5},{"t":"건방진 그 녀석.","c":0,"g":"순정","f":"건방진그녀석","tags":["classic"],"fem":0.5},{"t":"오란고교 호스트부","c":0,"g":"순정","f":"오란고교호스트부","tags":["classic","laugh"],"fem":0.5},{"t":"신장판 꿈빛 파티시엘","c":0,"g":"순정","f":"꿈빛파티시엘","tags":["classic"],"fem":0.5},{"t":"캐릭캐릭 체인지! 신장판","c":0,"g":"순정","f":"캐릭캐릭체인지","tags":["classic"],"fem":0.5}]}]},"4":{"name":"영애 수집가","tag":"파혼 선언에서 이야기가 시작되는 사람","desc":"드레스와 무도회, 그리고 운명을 뒤집는 영애. 마음에 든 시리즈는 한 권도 빠짐없이 모아 두는 타입이에요.","traits":["악역 영애가 잘되는 이야기에 약하다","서재에 같은 장르가 줄지어 있다","\"이번 생은 다르게\"라는 말에 끌린다"],"subs":[{"id":25,"name":"악역영애 대표작","lp":[[-1.8971,-0.1625],[-0.1625,-1.8971],[-0.2231,-1.6094],[-1.204,-0.3567],[-0.6931,-0.6931],[-1.0498,-0.4308],[-0.9163,-0.5108],[-1.8971,-0.1625],[-0.5108,-0.9163],[-0.0513,-2.9957],[-1.3863,-0.2877],[-2.9957,-0.0513],[-0.9163,-0.5108],[-1.3863,-0.2877],[-1.3863,-0.2877]],"works":[{"t":"악역 영애 안의 사람","c":1,"g":"순정","f":"악역영애안의사람","tags":[],"fem":0.5},{"t":"못 미더운 악녀입니다만 ~추궁접서 교체전~","c":1,"g":"순정","f":"못미더운악녀","tags":[],"fem":0.5},{"t":"자칭 악역 영애인 약혼자 관찰 기록.","c":0,"g":"순정","f":"자칭악역영애인약혼자관찰기록","tags":[],"fem":0.5},{"t":"투명남과 인간녀","c":0,"g":"순정","f":"투명남과인간녀","tags":[],"fem":0.5},{"t":"나약MAX 영애인데 수완가 약혼자와 내기를 하고 말았다","c":0,"g":"순정","f":"나약max영애인데수완가약혼자와내기를하고말았다","tags":[],"fem":0.5},{"t":"버려진 악역 영애는 괴물에게 옛날이야기를 들려준다","c":0,"g":"순정","f":"버려진악역영애는괴물에게옛날이야기를들려준다","tags":[],"fem":0.5},{"t":"마왕성 요리사","c":0,"g":"판타지·SF","f":"마왕성요리사","tags":["daily"],"fem":0.5},{"t":"스킵 비트!","c":0,"g":"순정","f":"스킵비트","tags":["classic"],"fem":0.5},{"t":"죽음에서 돌아온 박복한 영애, 이번 생에는 최종 보스 오라버니에게 사랑받고 있어요","c":0,"g":"순정","f":"죽음에서돌아온박복한영애이번생에는최종보스오라버니에게사랑받고있어요","tags":["isekai"],"fem":0.5},{"t":"은둔형 외톨이 영애는 말이 통하는 성수 돌보미","c":0,"g":"순정","f":"은둔형외톨이영애는말이통하는성수돌보미","tags":[],"fem":0.5}]},{"id":26,"name":"영애·약혼 로맨스","lp":[[-1.8971,-0.1625],[-0.0513,-2.9957],[-0.2231,-1.6094],[-1.204,-0.3567],[-0.5978,-0.7985],[-1.0498,-0.4308],[-1.6094,-0.2231],[-1.8971,-0.1625],[-0.5978,-0.7985],[-0.0513,-2.9957],[-1.3863,-0.2877],[-2.9957,-0.0513],[-1.3863,-0.2877],[-1.3863,-0.2877],[-1.3863,-0.2877]],"works":[{"t":"죽어서 되돌아간 마법학교 생활을, 옛 연인과 프롤로그부터","c":1,"g":"순정","f":"죽어서되돌아간마법학교생활을옛연인과프롤로그부터","tags":["isekai"],"fem":0.5},{"t":"외톨이에는 익숙하니까요. 약혼자 방치 중!","c":0,"g":"순정","f":"외톨이에는익숙하니까요약혼자방치중","tags":[],"fem":0.5},{"t":"촌스럽단 말을 들은 영애의 화려한 변신","c":0,"g":"순정","f":"촌스럽단말을들은영애의화려한변신","tags":[],"fem":0.5},{"t":"안녕하세요. 반한 사람에게 사랑의 묘약을 의뢰받은 마녀입니다.","c":0,"g":"순정","f":"안녕하세요반한사람에게사랑의묘약을의뢰받은마녀입니다","tags":[],"fem":0.5},{"t":"벨 푸페의 슈퍼달링 약혼 \"취향이 아니야\"라는 말을 들은 인형 공녀, 참는 걸 그만두니 황자가 푹 빠졌다. 참으로 사랑스럽군!","c":1,"g":"순정","f":"벨푸페의슈퍼달링약혼취향이아니야라는말을들은인형공녀참는걸그만두니황자가푹빠졌다참으로사랑스럽군","tags":[],"fem":0.5},{"t":"세계를 구한 용사에게 스토킹 당하는 시골 소녀 이야기","c":0,"g":"순정","f":"세계를구한용사에게스토킹당하는시골소녀이야기","tags":[],"fem":0.5},{"t":"꽃을 숨긴 너의 유성","c":0,"g":"순정","f":"꽃을숨긴너의유성","tags":[],"fem":0.5},{"t":"못난이 고양이가 된 심약 영애인데, 모두가 두려워하는 군인 공작님에게 주워져 기절 직전입니다","c":0,"g":"순정","f":"못난이고양이가된심약영애인데모두가두려워하는군인공작님에게주워져기절직전입니다","tags":[],"fem":0.5},{"t":"집에서 도망치고 싶은 내가 어쩌다가 동경하던 대마법사님을 사버렸더니","c":1,"g":"순정","f":"집에서도망치고싶은내가어쩌다가동경하던대마법사님을사버렸더니","tags":[],"fem":0.5},{"t":"방관자의 사랑","c":0,"g":"순정","f":"방관자의사랑","tags":[],"fem":0.5}]},{"id":28,"name":"전생·최애 빙의물","lp":[[-1.8971,-0.1625],[-0.1625,-1.8971],[-0.2231,-1.6094],[-1.204,-0.3567],[-0.4308,-1.0498],[-1.0498,-0.4308],[-1.6094,-0.2231],[-1.8971,-0.1625],[-0.0513,-2.9957],[-0.0513,-2.9957],[-1.3863,-0.2877],[-2.9957,-0.0513],[-1.3863,-0.2877],[-1.3863,-0.2877],[-1.3863,-0.2877]],"works":[{"t":"전생 악녀의 흑역사","c":0,"g":"순정","f":"전생악녀의흑역사","tags":["isekai"],"fem":0.5},{"t":"최애가 오빠가 되었습니다","c":0,"g":"순정","f":"최애가오빠가되었습니다","tags":["isekai"],"fem":0.5},{"t":"데스 게임 만화의 흑막 살인귀의 여동생으로 전생해서 망했다","c":0,"g":"순정","f":"데스게임만화의흑막살인귀의여동생으로전생해서망했다","tags":["isekai","mystery"],"fem":0.5},{"t":"여동생은 시스콤 오빠가 귀찮아","c":0,"g":"드라마","f":"여동생은시스콤오빠가귀찮아","tags":["laugh"],"fem":0.5},{"t":"악역 영애, 세실리아 실비는 죽기 싫으므로 남장하기로 했습니다.","c":1,"g":"순정","f":"악역영애세실리아실비는죽기싫으므로남장하기로했습니다","tags":[],"fem":0.5},{"t":"신령님, 낙제 위기!","c":0,"g":"순정","f":"신령님낙제위기","tags":[],"fem":0.5}]}]},"5":{"name":"이세계 탐독가","tag":"그림이 없어도 세계가 보이는 사람","desc":"다시 태어나 다른 세계에서 시작하는 이야기라면 글로도 충분해요. 애니보다 원작 소설을 먼저 읽어 두는 타입이에요.","traits":["애니가 나오기 전에 원작부터 읽는다","설정과 세계관 이야기를 좋아한다","긴 시리즈도 겁내지 않는다"],"subs":[{"id":30,"name":"모험과 러브코미디 라노벨","lp":[[-0.4308,-1.0498],[-0.4308,-1.0498],[-1.8971,-0.1625],[-1.204,-0.3567],[-0.5978,-0.7985],[-0.7985,-0.5978],[-1.6094,-0.2231],[-1.0498,-0.4308],[-0.2877,-1.3863],[-1.8971,-0.1625],[-0.0513,-2.9957],[-2.3026,-0.1054],[-0.7985,-0.5978],[-0.9163,-0.5108],[-0.7985,-0.5978]],"works":[{"t":"Re : 제로부터 시작하는 이세계 생활","c":0,"g":"라노벨","f":"re제로부터시작하는이세계생활","tags":["dark","isekai"],"fem":0.5},{"t":"무직전생","c":0,"g":"라노벨","f":"무직전생","tags":["isekai"],"fem":0.5},{"t":"패배 히로인이 너무 많아!","c":0,"g":"라노벨","f":"패배히로인이너무많아","tags":["laugh"],"fem":0.5},{"t":"던전에서 만남을 추구하면 안 되는 걸까","c":0,"g":"라노벨","f":"던전에서만남을추구하면안되는걸까","tags":[],"fem":0.5},{"t":"옆집 천사님 때문에 어느샌가 인간적으로 타락한 사연","c":0,"g":"라노벨","f":"옆집천사님때문에어느샌가인간적으로타락한사연","tags":["daily"],"fem":0.5},{"t":"어서 오세요 실력지상주의 교실에 2학년 편","c":0,"g":"라노벨","f":"실력지상주의","tags":["mystery"],"fem":0.5},{"t":"가끔씩 툭하고 러시아어로 부끄러워하는 옆자리의 아랴 양","c":0,"g":"라노벨","f":"가끔씩툭하고러시아어로부끄러워하는옆자리의아랴양","tags":[],"fem":0.5}]},{"id":29,"name":"이야기로 읽는 판타지 라노벨","lp":[[-0.5108,-0.9163],[-0.9163,-0.5108],[-1.0498,-0.4308],[-0.7985,-0.5978],[-0.5978,-0.7985],[-0.7985,-0.5978],[-1.6094,-0.2231],[-1.0498,-0.4308],[-0.5978,-0.7985],[-1.8971,-0.1625],[-0.0513,-2.9957],[-2.3026,-0.1054],[-0.5108,-0.9163],[-0.5108,-0.9163],[-1.0498,-0.4308]],"works":[{"t":"약사의 혼잣말","c":0,"g":"라노벨","f":"약사","tags":["mystery"],"fem":0.5},{"t":"사일런트 위치","c":0,"g":"라노벨","f":"사일런트위치","tags":["mystery"],"fem":0.5},{"t":"책벌레의 하극상","c":0,"g":"라노벨","f":"책벌레의하극상","tags":["isekai"],"fem":0.5},{"t":"전생했더니 슬라임이었던 건에 대하여","c":0,"g":"라노벨","f":"슬라임","tags":["isekai"],"fem":0.5},{"t":"Fate/strange Fake (페이트 스트레인지 페이크)","c":0,"g":"라노벨","f":"fatestrangefake","tags":[],"fem":0.5},{"t":"못 미더운 악녀입니다만 ~추궁접서 교체전~","c":0,"g":"라노벨","f":"못미더운악녀","tags":[],"fem":0.5},{"t":"86 -에이티식스-","c":0,"g":"라노벨","f":"86에이티식스","tags":["dark","deep"],"fem":0.5},{"t":"터무니없는 스킬로 이세계 방랑 밥","c":0,"g":"라노벨","f":"방랑밥","tags":["daily","isekai"],"fem":0.5},{"t":"비탄의 망령은 은퇴하고 싶다","c":0,"g":"라노벨","f":"비탄의망령은은퇴하고싶다","tags":[],"fem":0.5},{"t":"이세계 유유자적 농가","c":0,"g":"라노벨","f":"이세계유유자적농가","tags":["daily","isekai"],"fem":0.5}]}]},"6":{"name":"백합 정원사","tag":"두 사람 사이의 미묘한 공기를 아끼는 사람","desc":"말하지 못한 마음, 조심스럽게 가까워지는 거리. 섬세한 감정선을 오래 곱씹는 타입이에요.","traits":["눈빛과 침묵에서 많은 걸 읽는다","천천히 가까워지는 이야기가 좋다","마음에 든 장면은 오래 기억한다"],"subs":[{"id":31,"name":"판타지·코미디 GL","lp":[[-1.0498,-0.4308],[-0.1625,-1.8971],[-2.3026,-0.1054],[-0.5978,-0.7985],[-0.5108,-0.9163],[-1.0498,-0.4308],[-1.6094,-0.2231],[-1.204,-0.3567],[-1.6094,-0.2231],[-2.5257,-0.0834],[-1.0498,-0.4308],[-2.3026,-0.1054],[-1.6094,-0.2231],[-0.7985,-0.5978],[-0.0513,-2.9957]],"works":[{"t":"네가 죽을 때까지 사랑하고 싶어","c":0,"g":"GL","f":"네가죽을때까지사랑하고싶어","tags":["dark","deep"],"fem":0.5},{"t":"비 오는 밤의 달","c":0,"g":"GL","f":"비오는밤의달","tags":["deep"],"fem":0.5},{"t":"마법소녀를 동경해서","c":0,"g":"GL","f":"마법소녀를동경해서","tags":[],"fem":0.5},{"t":"내가 연인이 될 수 있을 리 없잖아, 무리무리! (※무리가 아니었다?!)","c":0,"g":"라노벨","f":"무리무리","tags":["laugh"],"fem":0.5},{"t":"나를 먹고 싶은, 괴물","c":0,"g":"GL","f":"나를먹고싶은괴물","tags":["dark"],"fem":0.5},{"t":"안드로이드는 경험인 수에 들어가나요??","c":0,"g":"GL","f":"안드로이드는경험인수에들어가나요","tags":[],"fem":0.5}]},{"id":32,"name":"일상 속 설렘 GL","lp":[[-1.6094,-0.2231],[-0.1054,-2.3026],[-2.3026,-0.1054],[-0.2877,-1.3863],[-0.5978,-0.7985],[-1.0498,-0.4308],[-1.6094,-0.2231],[-1.8971,-0.1625],[-1.6094,-0.2231],[-2.5257,-0.0834],[-1.3863,-0.2877],[-2.3026,-0.1054],[-1.6094,-0.2231],[-0.7985,-0.5978],[-0.0513,-2.9957]],"works":[{"t":"신경 쓰이는 사람이 남자가 아니었다","c":0,"g":"GL","f":"신경쓰이는사람이남자가아니었다","tags":[],"fem":0.5},{"t":"우리가 사귀어도 괜찮을까","c":0,"g":"GL","f":"우리가사귀어도괜찮을까","tags":[],"fem":0.5},{"t":"최애가 부도칸에 가 준다면 난 죽어도 좋아","c":0,"g":"GL","f":"최애가부도칸에가준다면난죽어도좋아","tags":[],"fem":0.5},{"t":"다 보이는데요! 아이자와 양","c":0,"g":"GL","f":"다보이는데요아이자와양","tags":[],"fem":0.5}]}]}}};
+  const Q = D.questions, K = Q.map(q => q.k), N = Q.length;
+  const $ = (id) => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const sv = (tag, attrs = {}) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); return e; };
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- 인물 그림(대시보드 「그림으로 보는 고객」과 같은 그림) ----------
+  const SKIN = '#F2CDB0', NECK = '#E3B898', INK = '#2B2F3A', GOLD = '#F2C14E';
+  const WHO = {
+    0: {hair: '#2E3440', style: 'spiky', props: ['hood', 'phones', 'spark'], grin: true},
+    1: {hair: '#5B4034', style: 'bob', props: ['glasses', 'stack']},
+    2: {hair: '#3A2F2B', style: 'pony', props: ['buds', 'phone', 'blush']},
+    3: {hair: '#2B2A3A', style: 'long', props: ['heart', 'blush']},
+    4: {hair: '#7A4A2E', style: 'wavy', props: ['tiara', 'earring', 'collar']},
+    5: {hair: '#343A46', style: 'messy', props: ['hood', 'glasses', 'book']},
+    6: {hair: '#4B3B5C', style: 'short', props: ['lily', 'blush']},
+  };
+  const HAIR = {
+    spiky: {front: 'M20 30L19 20L24 22L24.5 13L29.5 18L33 10.5L36 18L41 13L41.5 21L46 19L44 30C41 24 37 22 32 22C27 22 23 24 20 30Z'},
+    bob: {back: 'M18.5 40C17 20 24 13 32 13C40 13 47 20 45.5 40Z', front: 'M21 29C21 20 26 16 32 16C38 16 43 20 43 29C40 24.5 36 23 32 23C28 23 24 24.5 21 29Z'},
+    pony: {back: 'M41 15C47 12 52 16 50 22C49 27 50 32 47 36C46 30 44 25 41 22Z', front: 'M20.5 30C20 19 26 15 32 15C38 15 44 19 43.5 30C41 24 37 21.5 32 21.5C27 21.5 23 24 20.5 30Z', bun: [44, 14.5, 4.6]},
+    long: {back: 'M18 32C18 17 25 12 32 12C39 12 46 17 46 32L47.5 56L16.5 56Z', front: 'M20.5 29C21 20 26 16.5 32 16.5C38 16.5 43 20 43.5 29C41 24.5 37 23 33 25.5C30 23 25 23.5 20.5 29Z'},
+    wavy: {back: 'M17.5 32C17 17 24 12 32 12C40 12 47 17 46.5 32C48 38 45 42 47 47C49 52 45 56 41 56L23 56C19 56 15 52 17 47C19 42 16 38 17.5 32Z', front: 'M20.5 30C20 20 26 15.5 32 15.5C38 15.5 44 20 43.5 30C41 23 35 21 28 24C25 25.5 22.5 27.5 20.5 30Z'},
+    messy: {front: 'M20 31C19 22 23 16 29 15.5L28 12.5L32 15L34 12L35.5 15.5C41 16.5 45 21 44 31C42 26 39 23 35 23L33 25.5L31.5 23C26.5 23 22.5 26 20 31Z'},
+    short: {back: 'M19 36C17.5 19 24 13.5 32 13.5C40 13.5 46.5 19 45 36Z', front: 'M20.5 31C20 20 26 15 33 15C39 15 44.5 20 43.5 29C40 26 35 24.5 29 25C25.5 25.5 22.5 27.5 20.5 31Z'},
+  };
+  let avN = 0;
+  const avatar = (id, size, label) => {
+    const c = WHO[id], h = HAIR[c.style], col = `var(--g${id})`;
+    const svg = sv('svg', {viewBox: '0 0 64 64', width: size, height: size});
+    if (label) { svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', label); } else svg.setAttribute('aria-hidden', 'true');
+    const cid = `qz-av-${++avN}`;
+    const defs = sv('defs'), cp = sv('clipPath', {id: cid});
+    cp.append(sv('circle', {cx: 32, cy: 32, r: 31})); defs.append(cp); svg.append(defs);
+    const g = sv('g', {'clip-path': `url(#${cid})`});
+    const add = (tag, attrs, style) => { const e = sv(tag, attrs); if (style) Object.assign(e.style, style); g.append(e); return e; };
+    const has = (k) => c.props.includes(k);
+    add('circle', {cx: 32, cy: 32, r: 32}, {fill: `color-mix(in srgb, ${col} var(--av-p), var(--av-base))`});
+    if (h.back) add('path', {d: h.back}, {fill: c.hair});
+    add('path', {d: 'M7 66C8 52 18 46.5 32 46.5C46 46.5 56 52 57 66Z'}, {fill: col});
+    add('path', {d: 'M28 38H36V48H28Z'}, {fill: NECK});
+    if (has('hood')) add('path', {d: 'M20 50C23 45.5 27 45 32 47.5C37 45 41 45.5 44 50', fill: 'none', 'stroke-width': 2.2}, {stroke: 'rgba(0,0,0,.2)'});
+    if (has('collar')) add('path', {d: 'M25.5 46.5L32 53L38.5 46.5L35.5 46.5L32 50L28.5 46.5Z'}, {fill: '#FFFFFF', opacity: '.92'});
+    add('ellipse', {cx: 32, cy: 30.5, rx: 10.5, ry: 12}, {fill: SKIN});
+    add('path', {d: h.front}, {fill: c.hair});
+    if (h.bun) add('circle', {cx: h.bun[0], cy: h.bun[1], r: h.bun[2]}, {fill: c.hair});
+    add('circle', {cx: 27.8, cy: 31.2, r: 1.35}, {fill: INK});
+    add('circle', {cx: 36.2, cy: 31.2, r: 1.35}, {fill: INK});
+    add('path', {d: c.grin ? 'M29 35.6Q32 39.2 35 35.6' : 'M29.6 36.2Q32 38.2 34.4 36.2', fill: 'none', 'stroke-width': 1.2, 'stroke-linecap': 'round'}, {stroke: '#B5563F'});
+    if (has('blush')) for (const x of [25.2, 38.8]) add('ellipse', {cx: x, cy: 34.6, rx: 2.2, ry: 1.2}, {fill: '#F08F8F', opacity: '.5'});
+    if (has('glasses')) {
+      for (const x of [27.8, 36.2]) add('circle', {cx: x, cy: 31.2, r: 3.5, fill: 'none', 'stroke-width': 1.1}, {stroke: INK});
+      add('path', {d: 'M31.3 31.2H32.7', 'stroke-width': 1.1}, {stroke: INK});
+    }
+    if (has('hood')) for (const x of [29.5, 34.5]) add('path', {d: `M${x} 49V57`, 'stroke-width': 1.2, 'stroke-linecap': 'round'}, {stroke: '#FFFFFF', opacity: '.85'});
+    if (has('phones')) {
+      add('path', {d: 'M20.2 29C19.5 8.5 44.5 8.5 43.8 29', fill: 'none', 'stroke-width': 2.4, 'stroke-linecap': 'round'}, {stroke: INK});
+      for (const x of [17.6, 41.4]) {
+        add('rect', {x, y: 25.5, width: 5, height: 10, rx: 2.4}, {fill: INK});
+        add('rect', {x: x + 1.3, y: 27.5, width: 2.4, height: 6, rx: 1.2}, {fill: col});
+      }
+    }
+    if (has('spark')) add('path', {d: 'M51 7L52.6 11.4L57 13L52.6 14.6L51 19L49.4 14.6L45 13L49.4 11.4Z'}, {fill: GOLD});
+    if (has('stack')) {
+      add('rect', {x: 41, y: 51, width: 14, height: 4.6, rx: 1}, {fill: `color-mix(in srgb, ${col} 55%, #FFFFFF)`});
+      add('rect', {x: 42, y: 46.4, width: 13, height: 4.6, rx: 1}, {fill: `color-mix(in srgb, ${col} 70%, ${INK})`});
+      add('rect', {x: 40.5, y: 41.8, width: 14.5, height: 4.6, rx: 1}, {fill: `color-mix(in srgb, ${col} 40%, #FFFFFF)`});
+    }
+    if (has('buds')) add('circle', {cx: 21.3, cy: 32.6, r: 1.7, 'stroke-width': 0.6}, {fill: '#FFFFFF', stroke: INK});
+    if (has('phone')) {
+      add('rect', {x: 16, y: 47, width: 9.5, height: 15, rx: 2}, {fill: INK});
+      add('rect', {x: 17.3, y: 48.6, width: 6.9, height: 11.2, rx: 1}, {fill: `color-mix(in srgb, ${col} 45%, #FFFFFF)`});
+      add('ellipse', {cx: 21.5, cy: 60.5, rx: 4.2, ry: 3}, {fill: SKIN});
+    }
+    if (has('heart')) add('path', {d: 'M49 22C44 18.5 42.5 15.5 44.5 13.3C46.2 11.6 48.3 12.3 49 14C49.7 12.3 51.8 11.6 53.5 13.3C55.5 15.5 54 18.5 49 22Z'}, {fill: '#F06A8B'});
+    if (has('tiara')) {
+      add('path', {d: 'M25.5 16.5L27.5 11.5L30 15L32 9.5L34 15L36.5 11.5L38.5 16.5Z'}, {fill: GOLD});
+      add('circle', {cx: 32, cy: 13.6, r: 1.1}, {fill: '#E0607E'});
+    }
+    if (has('earring')) for (const x of [21.6, 42.4]) add('circle', {cx: x, cy: 36.8, r: 1.3}, {fill: GOLD});
+    if (has('book')) {
+      add('rect', {x: 14.5, y: 48, width: 13, height: 16, rx: 1.5}, {fill: `color-mix(in srgb, ${col} 65%, ${INK})`});
+      add('rect', {x: 25.6, y: 49.2, width: 1.6, height: 13.6}, {fill: '#FFFFFF', opacity: '.8'});
+      add('ellipse', {cx: 24.5, cy: 58.5, rx: 3.6, ry: 3}, {fill: SKIN});
+    }
+    if (has('lily')) {
+      for (const r of [-40, 0, 40]) add('ellipse', {cx: 48, cy: 15.5, rx: 2.5, ry: 5.2, transform: `rotate(${r} 48 20)`, 'stroke-width': 0.8}, {fill: '#FFFFFF', stroke: col});
+      add('circle', {cx: 48, cy: 20, r: 1.4}, {fill: GOLD});
+    }
+    svg.append(g);
+    return svg;
+  };
+
+  // ---------- 만화 한 페이지(15컷) — 3글자 컷 이름(정주행·이세계)이 넓은 칸에 오도록 줄마다 폭을 정했다 ----------
+  const ROWS = [[1.5, 1, 1.1], [.9, 1.1, 1.5], [1.1, .9, 1.5], [1, 1.5, 1], [1.3, 1, 1.1]], RH = [1, 1.1, .95, 1.1, 1];
+  const buildPage = (el, labels) => {
+    el.textContent = '';
+    let i = 0;
+    ROWS.forEach((r, ri) => {
+      const row = document.createElement('div');
+      row.className = 'pg-row'; row.style.flexGrow = RH[ri];
+      r.forEach((fr) => {
+        const p = document.createElement('div');
+        p.className = 'pg-cut'; p.style.flexGrow = fr; p.dataset.i = i;
+        if (labels) { const s = document.createElement('span'); s.textContent = Q[i].cut; p.append(s); }
+        row.append(p); i++;
+      });
+      el.append(row);
+    });
+  };
+  const paintPage = (el, ans, cur) => {
+    el.querySelectorAll('.pg-cut').forEach((p) => {
+      const i = +p.dataset.i;
+      p.classList.toggle('is-yes', ans[i] === 1);
+      p.classList.toggle('is-no', ans[i] === 0);
+      p.classList.toggle('is-skip', ans[i] === 2);
+      p.classList.toggle('is-cur', i === cur);
+    });
+  };
+
+  // ---------- 계산(build_quiz.py 와 같은 순서·같은 수) — 답 1 = 예, 0 = 아니오, 2 = 잘 모르겠어요 ----------
+  const KI = Object.fromEntries(K.map((k, i) => [k, i]));
+  const TY = (g) => D.types[g];
+  const ll = (lp, ans) => {
+    let s = 0;
+    for (let i = 0; i < N; i++) { if (ans[i] === 1) s += lp[i][0]; else if (ans[i] === 0) s += lp[i][1]; }
+    return s;
+  };
+  const subScores = (subs, ans) => subs.map((s, i) => ll(s.lp, ans) - i * 0.02);
+  const rankSubs = (subs, ans) => {
+    const sc = subScores(subs, ans);
+    return subs.map((s, i) => i).sort((a, b) => (sc[b] - sc[a]) || (a - b)).map((i) => subs[i]);
+  };
+  const rankTypes = (ans) => {   // 유형 점수 = 그 유형에서 가장 닮은 세부 취향의 점수
+    const sc = {};
+    for (let g = 0; g < 7; g++) sc[g] = Math.max(...subScores(TY(g).subs, ans));
+    return [0, 1, 2, 3, 4, 5, 6].sort((a, b) => (sc[b] - sc[a]) || (D.pri.indexOf(a) - D.pri.indexOf(b)));
+  };
+  const workScore = (w, idx, subw, ans) => {
+    let s = subw - 0.09 * idx;
+    for (const k of w.tags) { const a = ans[KI[k]]; if (a === 1) s += D.tag_w; else if (a === 0) s -= D.tag_w; }
+    const h = ans[KI.hero];
+    if (h === 1) s += (w.fem - 0.5) * 0.8; else if (h === 0) s -= (w.fem - 0.5) * 0.8;
+    return s;
+  };
+  const pickWorks = (ranked, ans, n = 4, perSub = 3, exclude = []) => {
+    const c = [];
+    ranked.slice(0, 3).forEach((s, si) => {
+      const subw = [1.0, 0.55, 0.2][si];
+      s.works.forEach((w, idx) => c.push({sc: workScore(w, idx, subw, ans), si, idx, w, sub: s.name}));
+    });
+    c.sort((a, b) => (b.sc - a.sc) || (a.si - b.si) || (a.idx - b.idx));
+    const out = [], seen = new Set(exclude), cnt = [0, 0, 0];
+    for (const x of c) {
+      if (seen.has(x.w.f) || cnt[x.si] >= perSub) continue;
+      seen.add(x.w.f); cnt[x.si]++; out.push({...x.w, sub: x.sub});
+      if (out.length === n) break;
+    }
+    return out;
+  };
+  // 결과를 가른 답: 1위 세부 취향과 2위 유형의 세부 취향 사이를 가장 크게 벌린 답 3개
+  const decisive = (ans, s1, s2) => K.map((k, i) => {
+    if (ans[i] !== 1 && ans[i] !== 0) return {i, d: 0};
+    const j = ans[i] === 1 ? 0 : 1;
+    return {i, d: s1.lp[i][j] - s2.lp[i][j]};
+  }).filter((x) => x.d > 0.05).sort((a, b) => b.d - a.d).slice(0, 3);
+  const ansWord = (a) => (a === 1 ? '예' : '아니오');
+  const link = (t) => 'https://ridibooks.com/search?q=' + encodeURIComponent(t);
+
+  // ---------- 화면 전환 ----------
+  const screens = ['start', 'quiz', 'result'];
+  const show = (id, focusEl) => {
+    screens.forEach((s) => { $(s).hidden = s !== id; });
+    window.scrollTo(0, 0);
+    if (focusEl) focusEl.focus({preventScroll: true});
+  };
+
+  let ans = new Array(N).fill(undefined), idx = 0, busy = false;
+
+  const setQuestion = (animate) => {
+    const apply = () => {
+      $('qtext').textContent = Q[idx].q;
+      $('qn').firstChild.nodeValue = String(idx + 1);
+      const left = N - idx - 1;
+      $('qleft').textContent = left ? `남은 질문 ${left}개` : '마지막 질문';
+      $('b-yes').setAttribute('aria-pressed', String(ans[idx] === 1));
+      $('b-no').setAttribute('aria-pressed', String(ans[idx] === 0));
+      $('b-skip').setAttribute('aria-pressed', String(ans[idx] === 2));
+      $('b-back').disabled = idx === 0;
+      paintPage($('pg-quiz'), ans, idx);
+      $('pg-quiz').setAttribute('aria-label', `만화 한 페이지 ${N}컷 중 ${idx}컷 채움`);
+    };
+    const qin = $('qin');
+    if (!animate || reduce()) { apply(); return; }
+    busy = true;
+    qin.classList.add('out');
+    setTimeout(() => { apply(); qin.classList.remove('out'); busy = false; }, 110);
+  };
+
+  const answer = (v) => {
+    if (busy || $('quiz').hidden) return;
+    ans[idx] = v;
+    paintPage($('pg-quiz'), ans, idx);
+    const cut = $('pg-quiz').querySelector(`[data-i="${idx}"]`);
+    cut.classList.remove('just'); void cut.offsetWidth; cut.classList.add('just');
+    if (idx < N - 1) { idx++; setQuestion(true); }
+    else finish();
+  };
+  const back = () => { if (idx > 0 && !busy) { idx--; setQuestion(true); } };
+
+  const finish = () => {
+    try { history.replaceState(null, '', '#r=' + ans.join('')); } catch (e) {}
+    renderResult();
+    show('result', $('r-name'));
+  };
+
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  const renderResult = () => {
+    const order = rankTypes(ans), t1 = order[0], t2 = order[1];
+    const T = TY(t1), T2 = TY(t2);
+    const subs = rankSubs(T.subs, ans), best = subs[0];
+    const subs2 = rankSubs(T2.subs, ans);
+    const works = pickWorks(subs, ans);
+    const res = $('result');
+    res.style.setProperty('--tc', `var(--g${t1})`);
+
+    $('r-av').replaceChildren(avatar(t1, 88, `${T.name} 인물 그림${D.who[t1] ? ': ' + D.who[t1] : ''}`));
+    const h = $('r-name'); h.textContent = '';
+    h.append(el('span', 'mark', T.name));
+    $('r-tag').textContent = T.tag;
+    $('r-desc').textContent = T.desc;
+    $('r-traits').replaceChildren(...T.traits.map((x) => el('li', null, x)));
+    const like = D.who[t1];
+    $('r-like').hidden = !like;
+    if (like) $('r-like').textContent = `리디에서 이 취향과 가장 닮은 독자 모습 · ${like}`;
+    $('r-sub').textContent = '세부 취향 · ' + best.name;
+
+    const SP = ['100%', '78%', '60%', '45%'];
+    $('r-books').replaceChildren(...works.map((w, i) => {
+      const li = el('li'), a = el('a');
+      a.href = link(w.t); a.target = '_blank'; a.rel = 'noopener';
+      a.setAttribute('aria-label', `${w.t}${w.c ? ' 코믹판' : ''}, 리디에서 찾기(새 창)`);
+      const sp = el('i', 'spine'); sp.style.setProperty('--sp', SP[i] || '45%');
+      const mid = el('div');
+      mid.append(el('div', 'bt', w.t), el('div', 'bm', [w.g, w.c ? '코믹판' : '', w.sub !== best.name ? w.sub : ''].filter(Boolean).join(' · ')));
+      const go = el('span', 'go'); go.setAttribute('aria-hidden', 'true'); go.innerHTML = '<span class="go-t">리디에서 찾기 </span>↗';
+      a.append(sp, mid, go); li.append(a); return li;
+    }));
+
+    buildPage($('pg-mine'), true); paintPage($('pg-mine'), ans, -1);
+    const yesCuts = Q.filter((q, i) => ans[i] === 1).map((q) => q.cut);
+    $('pg-mine').setAttribute('aria-label', `나의 한 페이지: 예라고 답한 컷 ${yesCuts.length ? yesCuts.join(', ') : '없음'}`);
+    const dec = decisive(ans, best, subs2[0]);
+    const m = $('r-mine'); m.textContent = '';
+    const p1 = el('p');
+    if (yesCuts.length) p1.append('예라고 답한 컷 ', el('b', null, yesCuts.join(' · ')), '.');
+    else p1.append('예라고 답한 컷이 없어요. 아니오와 모름의 무게로 정해졌어요.');
+    m.append(p1);
+    if (dec.length) {
+      const p2 = el('p', 'why');
+      p2.append(`${T2.name}보다 ${T.name}에 가까웠던 건 `);
+      dec.forEach((x, j) => { if (j) p2.append(' · '); p2.append(el('b', null, `${Q[x.i].cut} ‘${ansWord(ans[x.i])}’`)); });
+      p2.append(' 덕분이에요.');
+      m.append(p2);
+    }
+
+    $('s-av').replaceChildren(avatar(t2, 52));
+    $('s-name').textContent = T2.name;
+    const w2 = pickWorks(subs2, ans, 2, 2, works.map((w) => w.f));
+    $('s-books').replaceChildren(...w2.map((w) => {
+      const li = el('li'), a = el('a', null, w.t + (w.c ? ' (코믹판)' : '') + ' ↗');
+      a.href = link(w.t); a.target = '_blank'; a.rel = 'noopener';
+      li.append(a); return li;
+    }));
+
+    $('all-types').replaceChildren(...[0, 1, 2, 3, 4, 5, 6].map((g) => {
+      const li = el('li'); if (g === t1) li.className = 'me';
+      const d = el('div'); d.append(el('b', null, TY(g).name), el('span', null, TY(g).tag));
+      li.append(avatar(g, 40), d); return li;
+    }));
+
+    $('status').textContent = '';
+    res._copy = `[만화 취향 테스트]\n나는 「${T.name}」 — ${T.tag}\n세부 취향: ${best.name}\n추천: ${works.map((w) => w.t).join(' · ')}`
+      + (dec.length ? `\n결과를 가른 답: ${dec.map((x) => `${Q[x.i].cut} ${ansWord(ans[x.i])}`).join(' · ')}` : '')
+      + (D.pub ? `\n나도 해 보기: ${location.origin}${location.pathname}` : '');
+    res.dataset.type = T.name; res.dataset.sub = best.name; res.dataset.second = T2.name;
+    res.dataset.works = works.map((w) => w.t).join('|'); res.dataset.works2 = w2.map((w) => w.t).join('|');
+  };
+
+  const restart = () => {
+    ans = new Array(N).fill(undefined); idx = 0;
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    paintPage($('pg-start'), ans, -1);
+    show('start', $('t-start'));
+  };
+
+  const copyText = (text) => {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise((ok, no) => {
+      const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.append(ta); ta.select();
+      try { document.execCommand('copy') ? ok() : no(); } catch (e) { no(e); } finally { ta.remove(); }
+    });
+  };
+
+  // ---------- 시작 ----------
+  buildPage($('pg-start'), false);
+  buildPage($('pg-quiz'), false);
+  $('faces').replaceChildren(...[0, 1, 2, 3, 4, 5, 6].map((g) => avatar(g, 40, `${TY(g).name}${D.who[g] ? ': ' + D.who[g] : ''}`)));
+
+  $('go').addEventListener('click', () => { idx = 0; setQuestion(false); show('quiz', $('qtext')); });
+  $('b-yes').addEventListener('click', () => answer(1));
+  $('b-no').addEventListener('click', () => answer(0));
+  $('b-skip').addEventListener('click', () => answer(2));
+  $('b-back').addEventListener('click', back);
+  $('b-again').addEventListener('click', restart);
+  $('b-copy').addEventListener('click', () => {
+    copyText($('result')._copy || '').then(
+      () => { $('status').textContent = '결과를 복사했어요. 원하는 곳에 붙여 넣으세요.'; },
+      () => { $('status').textContent = '복사하지 못했어요. 화면을 길게 눌러 직접 복사해 주세요.'; });
+  });
+  document.addEventListener('keydown', (e) => {
+    if ($('quiz').hidden || e.altKey || e.ctrlKey || e.metaKey) return;
+    const k = e.key.toLowerCase();
+    if (k === 'y' || k === '1') { e.preventDefault(); answer(1); }
+    else if (k === 'n' || k === '2') { e.preventDefault(); answer(0); }
+    else if (k === 'm' || k === '3') { e.preventDefault(); answer(2); }
+    else if (k === 'backspace') { e.preventDefault(); back(); }
+  });
+
+  // 주소 끝 #r=(0·1·2 열다섯 자리)면 그 답으로 결과를 바로 연다(공유·점검용). #q= 는 그 답까지 칠한 질문 화면.
+  const mr = new RegExp(`^#r=([012]{${N}})$`).exec(location.hash);
+  if (mr) { ans = [...mr[1]].map(Number); renderResult(); show('result'); }
+  const mq = new RegExp(`^#q=([012]{0,${N - 1}})$`).exec(location.hash);
+  if (mq) { [...mq[1]].forEach((c, i) => { ans[i] = +c; }); idx = mq[1].length; setQuestion(false); show('quiz'); }
+})();
+</script>
+</body>
+</html>
